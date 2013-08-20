@@ -12,7 +12,7 @@ with all headers.
 
 Note that all header field names are *lowercase*.  e.g. 
 `headers.get('accept-language')`, `headers.get('x-forwarded-for')`,
-etc.
+etc (like with ExpressJS [req.get](http://expressjs.com/api.html#req.get)).
 
 ## On the Client
 
@@ -32,4 +32,3 @@ values, is via the server.
 ## References
 
 * [List of HTTP header fields](http://en.wikipedia.org/wiki/List_of_HTTP_header_fields)
-* [ExpressJS req.get](http://expressjs.com/api.html#req.get) (used by Meteor)
