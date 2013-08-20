@@ -10,8 +10,9 @@ Use `headers.get()` to access HTTP headers sent by the client.
 headers.get('host'), whereas headers.get() will return an object
 with all headers.
 
-Note that all headers (both the key and
-value) are lowercase.  e.g. `reqHeaders.host`, etc.
+Note that all header field names are *lowercase*.  e.g. 
+`headers.get('accept-language')`, `headers.get('x-forwarded-for')`,
+etc.
 
 ## On the Client
 
@@ -27,3 +28,8 @@ the browser via Javascript.  There's a trick to make an XHR request in the
 browser to get the headers, but note, this does NOT INCLUDE ALL HEADERS.
 Unfortunately the ONLY reliable method, to get all headers with their correct
 values, is via the server.
+
+## References
+
+* [List of HTTP header fields](http://en.wikipedia.org/wiki/List_of_HTTP_header_fields)
+* [ExpressJS req.get](http://expressjs.com/api.html#req.get) (used by Meteor)
