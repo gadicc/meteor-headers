@@ -2,6 +2,11 @@ headers = {
 	list: {},
 	get: function(header, callback) {
 		return header ? this.list[header] : this.list;
+	},
+	getClientIP: function(proxyCount) {
+		var chain = this.list['x-ip-chain'].split(',');
+		proxyCount = proxyCount ? proxyCount + 1 : 1;
+		return chain[chain.length - proxyCount];
 	}
 }
 

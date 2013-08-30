@@ -3,7 +3,7 @@
     "description": "Access HTTP headers on both server and client",
     "homepage": "https://github.com/gadicohen/meteor-headers",
     "author": "Gadi Cohen <dragon@wastelands.net>",
-    "version": "0.0.4",
+    "version": "0.0.5",
     "git": "https://github.com/gadicohen/meteor-headers.git",
 	"packages": {}
 }
