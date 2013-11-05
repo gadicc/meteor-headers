@@ -39,10 +39,15 @@ common pattern for this.
 
 Usage: `headers.getClientIP(proxyCount)`
 
-`proxyCount` can be ommitted if you aren't running any proxies / caches / load balancers, otherwise it should be the number of proxies used as part of your hosting setup (i.e. that you can vouch for / trust).
+`proxyCount` can be ommitted if you aren't running any proxies / caches / load balancers, otherwise it should be the number of proxies used as part of your hosting setup (i.e. that you can vouch for / trust).  It may also be ommitted if you've set proxyCount globally (see below).
 
 Explanation: each proxy in the chain appends to the X-Forwarded-For header, such that if you know the number of proxies, you can work out the initial IP address that the first proxy
 in the chain specified as the end user's IP address. Thus, even if the end-user sends a request with his own X-Forwarded-For header, you can ignore these fake IPs. In the case where the user's ISP has a transparent proxy, you'll get that proxy's IP... but that remains the only IP that you know for sure is real.  See [issue #2](https://github.com/gadicohen/meteor-headers/issues/2)
+
+You can set *proxyCount* globally with `headers.setProxyCount(proxyCount)` (on both client
+and server, depending on where you need it).  If you're writing your own smart package,
+which depends on getClientIP(), you should advise your end-users about this step.  If you
+need to access the value again, use `getProxyCount()`.
 
 ## References
 

@@ -1,15 +1,3 @@
-headers = {
-	list: {},
-	get: function(header) {
-		return header ? this.list[header] : this.list;
-	},
-  getClientIP: function(proxyCount) {
-    var chain = this.list['x-ip-chain'].split(',');
-    proxyCount = proxyCount ? proxyCount + 1 : 1;
-    return chain[chain.length - proxyCount];
-  }
-};
-
 var app = typeof WebApp != 'undefined'
   ? WebApp.connectHandlers : __meteor_bootstrap__.app;
 app.use(function(req, res, next) {
