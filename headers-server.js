@@ -28,7 +28,7 @@ WebApp.connectHandlers.use('/headersHelper.js', function(req, res, next) {
   headers.list[token] = req.headers;
 
   res.writeHead(200, { 'Content-type': 'application/javascript' });
-  res.end("headers.store(" + JSON.stringify(req.headers) + ");", 'utf8');
+  res.end("Package.headers.headers.store(" + JSON.stringify(req.headers) + ");", 'utf8');
 });
 
 /*
