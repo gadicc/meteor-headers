@@ -1,6 +1,6 @@
 # headers
 
-Access HTTP headers on both server and client.
+Access HTTP headers on both server and client (+ clientIP funcs)
 For Meteor < 0.6.5, you need to use meteor-headers 0.0.7.
 
 ## On the Client
@@ -14,8 +14,18 @@ Note that all header field names are *lowercase*.  e.g.
 `headers.get('accept-language')`, `headers.get('x-forwarded-for')`,
 etc (like with ExpressJS [req.get](http://expressjs.com/api.html#req.get)).
 
-Guaranteed to be available once the document is ready.
-See the notes below on how we do this, and also about `getClientIP()`.
+Guaranteed to be available once the document is ready.  If you want any
+code to run as soon as headers are available, but before the document is
+ready, provide a callback function to `headers.ready()`, e.g.
+
+```js
+headers.ready(function() {
+	console.log(headers.get());
+});
+```
+
+See the notes below on how we retrieve the headers, why it's necessary
+to do it this way, and also the note about `getClientIP()`.
 
 ## On the Server
 

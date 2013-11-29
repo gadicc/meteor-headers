@@ -10,6 +10,20 @@ headers.token = new Date().getTime() + Math.random();
 headers.store = function(headers) {
 	this.list = headers;
 	Meteor.call('headersToken', this.token);
+ 	for (var i=0; i < this.readies.length; i++)
+ 		this.readies[i]();
+ 	this.readiesRun = true;
+};
+
+/*
+ * Store a callback to be run when headersHelper.js completes */
+headers.readies = [];
+headers.readiesRun = false;
+headers.ready = function(callback) {
+	this.readies.push(callback);
+	// Run immediately if headers.store() was already called previously
+	if (this.readiesRun)
+		callback();
 };
 
 /*
