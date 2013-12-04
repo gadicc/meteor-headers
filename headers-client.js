@@ -4,6 +4,11 @@
 headers.token = new Date().getTime() + Math.random();
 
 /*
+ * Used for reactivity
+ */
+headers.dep = new Deps.Dependency;
+
+/*
  * Called after receiving all the headers, used to re-associate headers
  * with this clients livedata session (see headers-server.js)
  */
@@ -13,17 +18,28 @@ headers.store = function(headers) {
  	for (var i=0; i < this.readies.length; i++)
  		this.readies[i]();
  	this.readiesRun = true;
+ 	this.dep.changed();
 };
 
 /*
- * Store a callback to be run when headersHelper.js completes */
+ * This has two completely different uses, but retains the same name
+ * as this is what people expect.
+ *
+ * With an arg: Store a callback to be run when headersHelper.js completes
+ * Without an arg: Return a reactive boolean on whether or not we're ready
+ */
 headers.readies = [];
 headers.readiesRun = false;
 headers.ready = function(callback) {
-	this.readies.push(callback);
-	// Run immediately if headers.store() was already called previously
-	if (this.readiesRun)
-		callback();
+	if (callback) {
+		this.readies.push(callback);
+		// Run immediately if headers.store() was already called previously
+		if (this.readiesRun)
+			callback();
+	} else {
+		this.dep.depend();
+		return Object.keys(this.list).length > 0;
+	}
 };
 
 /*
@@ -42,6 +58,7 @@ headers.ready = function(callback) {
  * Get a header or all headers
  */
 headers.get = function(header) {
+ 	this.dep.depend();
 	return header ? this.list[header] : this.list;
 }
 
@@ -49,7 +66,7 @@ headers.get = function(header) {
  * Get the client's IP address (see README.md)
  */
 headers.getClientIP = function(proxyCount) {
-	var chain = this.list['x-ip-chain'].split(',');
+	var chain = this.get('x-ip-chain').split(',');
 	if (typeof(proxyCount) == 'undefined')
 		proxyCount = this.proxyCount;
 	return chain[chain.length - proxyCount - 1];

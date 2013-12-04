@@ -40,6 +40,7 @@ Meteor.methods({
   'headersToken': function(token) {
     if (headers.list[token]) {
       this._sessionData.headers = headers.list[token];
+      headerDep(this._sessionData).changed();
       delete headers.list[token];
     }
   }
@@ -55,14 +56,41 @@ Meteor.setInterval(function() {
 }, HEADERS_CLEANUP_TIME);
 
 /*
+ * Return the headerDep.  Create if necessary.
+ */
+function headerDep(obj) {
+  if (!obj.headerDep)
+    obj.headerDep = new Deps.Dependency();
+  return obj.headerDep;
+}
+
+/*
  * Usage in a Meteor method: headers.get(this, 'host')
  */
 headers.get = function(self, key) {
-  return key ? self._sessionData.headers[key] : self._sessionData.headers;
+  if (!self)
+    throw new Error('Must be called like this on the server: headers.get(this)');
+  var sessionData = self._session ? self._session.sessionData : self._sessionData;
+  headerDep(sessionData).depend();
+  if (!(sessionData && sessionData.headers))
+    return key ? undefined : {};
+  return key ? sessionData.headers[key] : sessionData.headers;
+}
+
+headers.ready = function(self) {
+  if (!self)
+    throw new Error('Must be called like this on the server: headers.get(this)');
+  var sessionData = self._session ? self._session.sessionData : self._sessionData;
+  headerDep(sessionData).depend();
+  return Object.keys(sessionData.headers).length > 0;
 }
 
 headers.getClientIP = function(self, proxyCount) {
-  var chain = self._sessionData.headers['x-ip-chain'].split(',');
+  if (!self)
+    throw new Error('Must be called like this on the server: headers.get(this)');
+  var sessionData = self._session ? self._session.sessionData : self._sessionData;
+  var chain = sessionData.headers['x-ip-chain'].split(',');
+  headerDep(sessionData).depend();
   if (typeof(proxyCount) == 'undefined')
     proxyCount = this.proxyCount;
   return chain[chain.length - proxyCount - 1];
@@ -74,11 +102,12 @@ headers.getClientIP = function(self, proxyCount) {
 headers.methodClientIP = function(self, proxyCount) {
   // convoluted way to find our session
   // TODO, open an issue with Meteor to see if we can get easier access
+  var sessionData = self._session ? self._session.sessionData : self._sessionData;
   var token, session;
   token = new Date().getTime() + Math.random();
-  self._sessionData.tmpToken = token;
+  sessionData.tmpToken = token;
   session = _.find(Meteor.server.sessions, function(session) {
-    return session.sessionData.tmpToken == token;
+    return sessionData.tmpToken == token;
   });
 
   var chain = ipChain(session.socket.headers, session.socket);

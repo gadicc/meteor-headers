@@ -16,7 +16,7 @@ etc (like with ExpressJS [req.get](http://expressjs.com/api.html#req.get)).
 
 Guaranteed to be available once the document is ready.  If you want any
 code to run as soon as headers are available, but before the document is
-ready, provide a callback function to `headers.ready()`, e.g.
+ready, provide a callback function to `headers.ready(callback)`, e.g.
 
 ```js
 headers.ready(function() {
@@ -24,14 +24,24 @@ headers.ready(function() {
 });
 ```
 
+It's confusing, but `headers.ready()` called without any arguments
+is a reactive `ready()` function which could be used in all the usual
+places (e.g. with iron-router's waitOn).  `headers.get()` is reactive
+too.
+
 See the notes below on how we retrieve the headers, why it's necessary
 to do it this way, and also the note about `getClientIP()`.
 
 ## On the Server
 
-Available in Meteor methods (let me know where else you might need them).
 As above, but you need to pass `this` as the first argument.  e.g.
-`headers.get(this)` or `headers.get(this, 'host')`.
+`headers.get(this)` or `headers.get(this, 'host')`, and likewise,
+`headers.ready(this)`.
+
+Available in Meteor methods and publish functions.  There is now way
+to do this for Collection allow/denies unfortunately (but since that
+relies on a userId, you could use your own logic to set the latest
+headers per userId). 
 
 ## getClientIP() -- freebie
 
@@ -73,7 +83,12 @@ values, that the client sends to the server, is via the server.
 This is the same reason why we can't rely on the headers available on the
 open socket (sockjs / websocket), as used in `methodClientIP()`.  Additionally,
 the script returns the values straight away, and will be available as soon as
-the document ready callbacks are fired.  Why the unique token?  See below.
+the document ready callbacks are fired.
+
+Note, although we HAVE to get the headers via the server, it would be great
+if we didn't have to make another request to the server.  At the end of the
+day, this functionality should be provided internally be Meteor.  This package
+is a workaround until that day :>
 
 *After the headers are retrieved, send our unique token via livedata*
 
@@ -86,3 +101,5 @@ the correct data with the header (see source for details).
 ## References
 
 * [List of HTTP header fields](http://en.wikipedia.org/wiki/List_of_HTTP_header_fields)
+* [Issue #786: this.hostname](https://github.com/meteor/meteor/issues/786)
+* [Issue #1624: Client address & headers](https://github.com/meteor/meteor/issues/1624)

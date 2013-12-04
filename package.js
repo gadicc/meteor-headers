@@ -4,7 +4,7 @@ Package.describe({
 
 Package.on_use(function(api) {
 	// meteor-headers 0.0.7 was the last version to support Meteor < 0.6.5
-	api.use(['webapp', 'livedata', 'templating'], ['client', 'server']);
+	api.use(['webapp', 'livedata', 'templating', 'deps'], ['client', 'server']);
 	api.use('standard-app-packages', 'client');
     api.add_files('headers-common.js', ['client', 'server']);
     api.add_files('headers-server.js', 'server');
