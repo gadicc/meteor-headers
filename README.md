@@ -27,10 +27,29 @@ headers.ready(function() {
 It's confusing, but `headers.ready()` called without any arguments
 is a reactive `ready()` function which could be used in all the usual
 places (e.g. with iron-router's waitOn).  `headers.get()` is reactive
-too.
+too.  You can use this for example with iron-router to ensure that
+the headers are available before the first route is executed:
+
+```js
+  Router.map(function() {
+    this.route('/', {
+      template: 'hello',
+      loadingTemplate: 'loading',
+      waitOn: headers,
+      action: function() {
+        // Will only be happen once.  Without the waitOn, you'll see it happens
+        // twice, once before headers are ready, and once after they've arrived.
+        console.log(headers.get());
+      }
+    })
+  });
+```
+
+For more info see the relevant sections in the iron-router docs.
 
 See the notes below on how we retrieve the headers, why it's necessary
 to do it this way, and also the note about `getClientIP()`.
+
 
 ## On the Server
 
