@@ -2,6 +2,10 @@
 
 ## vNext
 
+## v0.0.12
+
+* Support for Meteor 0.6.7
+
 ## v0.0.11
 
 * Made .get() reactive on both the client (e.g. for routing) and server

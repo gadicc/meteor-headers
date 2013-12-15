@@ -22,6 +22,14 @@ headers.store = function(headers) {
 };
 
 /*
+need to think about surviving a hot code reload, headers on server lost
+Deps.autorun(function() {
+	if (Meteor.status().connected)
+		Meteor.call('headersToken', this.token);
+});
+*/
+
+/*
  * This has two completely different uses, but retains the same name
  * as this is what people expect.
  *

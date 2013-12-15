@@ -39,8 +39,9 @@ WebApp.connectHandlers.use('/headersHelper.js', function(req, res, next) {
 Meteor.methods({
   'headersToken': function(token) {
     if (headers.list[token]) {
-      this._sessionData.headers = headers.list[token];
-      headerDep(this._sessionData).changed();
+      var data = this.connection || this._sessionData;
+      data.headers = headers.list[token];
+      headerDep(data).changed();
       delete headers.list[token];
     }
   }
@@ -65,12 +66,12 @@ function headerDep(obj) {
 }
 
 /*
- * Usage in a Meteor method: headers.get(this, 'host')
+ * Usage in a Meteor method/publish: headers.get(this, 'host')
  */
 headers.get = function(self, key) {
   if (!self)
     throw new Error('Must be called like this on the server: headers.get(this)');
-  var sessionData = self._session ? self._session.sessionData : self._sessionData;
+  var sessionData = self.connection || (self._session ? self._session.sessionData : self._sessionData);
   headerDep(sessionData).depend();
   if (!(sessionData && sessionData.headers))
     return key ? undefined : {};
@@ -80,17 +81,15 @@ headers.get = function(self, key) {
 headers.ready = function(self) {
   if (!self)
     throw new Error('Must be called like this on the server: headers.get(this)');
-  var sessionData = self._session ? self._session.sessionData : self._sessionData;
+  var sessionData = self.connection || (self._session ? self._session.sessionData : self._sessionData);
   headerDep(sessionData).depend();
   return Object.keys(sessionData.headers).length > 0;
 }
 
 headers.getClientIP = function(self, proxyCount) {
   if (!self)
-    throw new Error('Must be called like this on the server: headers.get(this)');
-  var sessionData = self._session ? self._session.sessionData : self._sessionData;
-  var chain = sessionData.headers['x-ip-chain'].split(',');
-  headerDep(sessionData).depend();
+    throw new Error('Must be called like this on the server: headers.getClientIP(this)');
+  var chain = this.get(self, 'x-ip-chain').split(',');
   if (typeof(proxyCount) == 'undefined')
     proxyCount = this.proxyCount;
   return chain[chain.length - proxyCount - 1];
@@ -100,18 +99,26 @@ headers.getClientIP = function(self, proxyCount) {
  * Get the IP for the livedata connection used by a Method (see README.md)
  */
 headers.methodClientIP = function(self, proxyCount) {
-  // convoluted way to find our session
-  // TODO, open an issue with Meteor to see if we can get easier access
-  var sessionData = self._session ? self._session.sessionData : self._sessionData;
-  var token, session;
-  token = new Date().getTime() + Math.random();
-  sessionData.tmpToken = token;
-  session = _.find(Meteor.server.sessions, function(session) {
-    return sessionData.tmpToken == token;
-  });
+  var session, headers, chain;
+ 
+  if (self.connection) {
+    // Meteor 0.6.7+
+    session = Meteor.server.sessions[self.connection.id];
+  } else {
+    // convoluted way to find our session in Meteor < 0.6.7
+    var sessionData = self._session ? self._session.sessionData : self._sessionData;
+    var token, session;
+    token = new Date().getTime() + Math.random();
+    sessionData.tmpToken = token;
+    session = _.find(Meteor.server.sessions, function(session) {
+      return sessionData.tmpToken == token;
+    });
+  }
 
-  var chain = ipChain(session.socket.headers, session.socket);
+  headers = session.socket.headers;
+  chain = ipChain(headers, session.socket);
   if (typeof(proxyCount) == 'undefined')
     proxyCount = this.proxyCount;
   return chain[chain.length - proxyCount - 1];
 }
+
