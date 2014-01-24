@@ -12,22 +12,22 @@ headers.dep = new Deps.Dependency;
  * Called after receiving all the headers, used to re-associate headers
  * with this clients livedata session (see headers-server.js)
  */
-headers.store = function(headers) {
-	this.list = headers;
-	Meteor.call('headersToken', this.token);
+headers.store = function(mhData) {
+	this.list = mhData.headers;
+	Meteor.call('headersToken', mhData.token);
  	for (var i=0; i < this.readies.length; i++)
  		this.readies[i]();
  	this.readiesRun = true;
  	this.dep.changed();
 };
 
-/*
-need to think about surviving a hot code reload, headers on server lost
+// On each disconnect, queue reassociation for next connection
 Deps.autorun(function() {
-	if (Meteor.status().connected)
-		Meteor.call('headersToken', this.token);
+	var status = Meteor.status();
+	if (!status.connected && status.retryCount == 0) {
+		Meteor.call('headersToken', headers.token);
+	}
 });
-*/
 
 /*
  * This has two completely different uses, but retains the same name
@@ -50,17 +50,9 @@ headers.ready = function(callback) {
 	}
 };
 
-/*
- * Create another connection to retrieve our headers (see README.md for
- * why this is necessary).  Called with our unique token, the retrieved
- * code runs headers.store() above with the results
- */
-(function(d, t) {
-    var g = d.createElement(t),
-        s = d.getElementsByTagName(t)[0];
-    g.src = '/headersHelper.js?token=' + headers.token;
-    s.parentNode.insertBefore(g, s);
-}(document, 'script'));
+// Since 0.0.13, headers are available before this package is loaded :)
+headers.store(__headers__);
+delete(__headers__);
 
 /*
  * Get a header or all headers

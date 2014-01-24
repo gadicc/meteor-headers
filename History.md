@@ -2,6 +2,18 @@
 
 ## vNext
 
+## v0.0.13
+
+* Headers are now injected into the initial page load, so are available as
+as the package loads.  All the old headers.ready() functions remain in
+place for backwards compatibility, but are no longer required.
+
+* Added `headers.methodGet()` on the server.
+
+* Added checks to ensure that the server functions are called correctly.
+Will now throw an exception with helpful information on how to fix, rather
+than leaving the user wondering if it's a meteor-headers bug.
+
 ## v0.0.12
 
 * Support for Meteor 0.6.7

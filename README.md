@@ -1,6 +1,7 @@
 # headers
 
-Access HTTP headers on both server and client (+ clientIP funcs)
+Access HTTP headers on both server and client (+ clientIP funcs).
+
 For Meteor < 0.6.5, you need to use meteor-headers 0.0.7.
 
 ## On the Client
@@ -14,9 +15,12 @@ Note that all header field names are *lowercase*.  e.g.
 `headers.get('accept-language')`, `headers.get('x-forwarded-for')`,
 etc (like with ExpressJS [req.get](http://expressjs.com/api.html#req.get)).
 
-Guaranteed to be available once the document is ready.  If you want any
-code to run as soon as headers are available, but before the document is
-ready, provide a callback function to `headers.ready(callback)`, e.g.
+**Since 0.0.13, headers are available as soon as the package is loaded,
+i.e. before any of your app code is run.  The below is still supported
+for backwards compatibility purposes but is no longer required.**
+
+Queue callbacks that will be run as soon as headers are available
+(i.e. immediately since 0.0.13):
 
 ```js
 headers.ready(function() {
@@ -28,7 +32,8 @@ It's confusing, but `headers.ready()` called without any arguments
 is a reactive `ready()` function which could be used in all the usual
 places (e.g. with iron-router's waitOn).  `headers.get()` is reactive
 too.  You can use this for example with iron-router to ensure that
-the headers are available before the first route is executed:
+the headers are available before the first route is executed (no
+longer required since 0.0.13):
 
 ```js
   Router.map(function() {
@@ -55,12 +60,19 @@ to do it this way, and also the note about `getClientIP()`.
 
 As above, but you need to pass `this` as the first argument.  e.g.
 `headers.get(this)` or `headers.get(this, 'host')`, and likewise,
-`headers.ready(this)`.
+`headers.ready(this)`.  For callbacks / anonymous functions, use
+`var self=this;` and call `headers.get(self)` from within the func.
 
-Available in Meteor methods and publish functions.  There is now way
+Available in Meteor methods and publish functions.  There is no way
 to do this for Collection allow/denies unfortunately (but since that
 relies on a userId, you could use your own logic to set the latest
-headers per userId). 
+headers per userId)`
+
+
+Note, `headers.get()` will always provide the headers for the
+INITIAL CONNECTION and not the headers for the current connection
+of the open socket, which is used for publish/methods.  Use
+`headers.methodGet(this)` to get those headers.
 
 ## getClientIP() -- freebie
 
@@ -88,34 +100,22 @@ IP address of client connected to the socket over which the Method is running.
 
 ## How and why this all works
 
-There are a number of stages to the approach we've taken:
-
-*On client load, we request another script from the server, with a unique token*
-
-We'd love to avoid another round-trip to the server, but unfortunately this
-is essential.  Headers are NOT available from
-the browser via Javascript.  There's a trick to make an XHR request in the
+Intro: headers **have to** come from the server.  Headers are NOT available
+from the browser via Javascript.  There's a trick to make an XHR request in the
 browser to get the headers, but note, this does NOT INCLUDE ALL HEADERS.
 Unfortunately the ONLY reliable method, to get all headers with their correct
 values, that the client sends to the server, is via the server.
 
-This is the same reason why we can't rely on the headers available on the
-open socket (sockjs / websocket), as used in `methodClientIP()`.  Additionally,
-the script returns the values straight away, and will be available as soon as
-the document ready callbacks are fired.
+1. On the initial request, all headers are returned on the initial page
+load and loaded on the client (injected into the HEAD, before even
+loading meteor-headers client side code).  The headers are also returned
+with a unique token generated for each request.
 
-Note, although we HAVE to get the headers via the server, it would be great
-if we didn't have to make another request to the server.  At the end of the
-day, this functionality should be provided internally be Meteor.  This package
-is a workaround until that day :>
-
-*After the headers are retrieved, send our unique token via livedata*
-
-Livedata keeps an (undocumented but hopefully permanent) sessionData variable
-per session.  This is where we store our headers on the server side, so they
-are available in Meteor methods (with the correct headers per client).  Since
-the initial pageload is not part of a session, we use the token to associate
-the correct data with the header (see source for details).
+2. When client code is loaded, we use a meteor method to send the above
+token back to the server, where we can reassociate the headers from the
+original request to the current socket.  This allows for headers.get()
+(as opposed to headers.methodGet) to return the correct data, which is
+kept in the connection session (maintained by livedata).
 
 ## References
 
