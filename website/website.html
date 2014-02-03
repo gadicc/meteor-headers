@@ -1,0 +1,219 @@
+<head>
+  <title>website</title>
+</head>
+
+<body>
+	<h1>Meteor Headers Test / Examples</h1>
+
+	<p>
+		See also
+		<a href="https://github.com/gadicohen/meteor-headers">Project Home</a>
+		(docs in README.md) and
+		<a href="https://github.com/gadicohen/meteor-headers/tree/master/website">website source</a>.
+	</p>
+
+
+	<div id="TOC">
+		<div>Contents</div>
+		<ol>
+				<li><a href="#clientIP">Client IP</a></li>
+				<li><a href="#clientHeaders">Client-side Headers</a></li>
+				<li><a href="#serverMethod">Server Headers (via Method Call)</a></li>
+				<ol>
+						<li><a href="#serverMethod">Initial Connection</a></li>
+						<li><a href="#serverMethodDDP">DDP/Socket Headers</a></li>
+				</ol>
+				<li><a href="#serverPublish">Server Headers (via Publish)</a></li>
+				<ol>
+						<li><a href="#serverPublish">Initial Connection</a></li>
+						<li><a href="#serverPublishDDP">DDP/Socket Headers</a></li>
+				</ol>
+		</ol>
+	</div>
+
+	{{> clientIP}}
+	{{> clientHeaders}}
+	{{> serverHeaders}}
+
+ {{#markdown}}
+ {{/markdown}}
+
+
+
+</body>
+
+<template name="clientIP">
+  <a name="clientIP"></a>
+  <h2>Client IP address (proxy-aware)</h2>
+
+  <p>Please see the docs of where and how to use this correctly.</p>
+
+  <p>Your initial connection was from <b>{{clientIP}}</b>
+    and your DDP/socket connection is from <b>{{socketIP}}</b>.</p>
+</template>
+
+<template name="clientHeaders">
+  <a name="clientHeaders"></a>
+  <h2>Client Side Headers</h2>
+
+  {{#markdown}}
+
+  **website.js**
+  ```js
+  Template.clientHeaders.headers = function() {
+    return JSON.stringify(headers.get(), null, 2);
+  }
+  ```
+
+  **Template render (in a pre)**
+```js
+{{headers}}
+```
+ You can also use `headers.get('host')`, etc.
+	{{/markdown}}
+</template>
+
+<template name="serverHeaders">
+ <h2>Server side Headers</h2>
+
+ <p>We send these back to the client just for testing purposes,
+ usually you'd use them just on the server.</p>
+
+ {{> serverMethod}}
+ {{> serverPublish}}
+
+</template>
+
+<template name="serverMethod">
+  <a name="serverMethod"></a>
+  <h3>Retrieved via Meteor Methods</h3>
+
+  {{#markdown}}
+
+  **website.js**
+  ```js
+if (Meteor.isServer) {
+
+  Meteor.methods({
+    'headers': function() {
+      return headers.get(this);
+
+});
+
+if (Meteor.isClient) {
+
+  Meteor.startup(function() {
+    Meteor.call('headers', function(error, data) {
+      Session.set('headers', data);
+    });
+  });
+
+  Session.setDefault('headers', 'Loading...');
+
+  Template.serverMethod.headers = function() {
+    var headers = Session.get('headers');
+    return JSON.stringify(headers, null, 2);
+  }
+}
+```
+
+**Template render (initial connection headers)**
+
+```js
+{{headers}}
+```
+
+You can also use `headers.get(this, 'host')`, etc.
+
+<a name="serverMethodDDP"></a>
+**Template render (DDP/socket headers)**
+
+Using `headers.methodGet(this)`.
+
+```js
+{{methodHeaders}}
+```
+
+You can also use `headers.methodGet(this, 'host')`, etc.
+
+	{{/markdown}}
+</template>
+
+<template name="serverPublish">
+  <a name="serverPublish"></a>
+  <h3>Retrieved via Meteor Publish</h3>
+
+  {{#markdown}}
+
+  Of course it makes no sense whatsoever to do this.  The below code is
+  just for demo/testing purposes, of course you wouldn't usually send
+  the headers back to the client like this, but rather make use of the
+  data inside the publish function itself.
+
+  **website.js**
+  ```js
+
+var headersCol = new Meteor.Collection('headers');
+
+if (Meteor.isServer) {
+
+  Meteor.publish('headers', function() {
+    var data = headers.get(this);
+    for (key in data)
+      this.added('headers', Random.id(), {
+        key: key, value: data[key]
+      });
+  });
+
+});
+
+if (Meteor.isClient) {
+
+  Template.serverPublish.headers = function() {
+    return headersCol.find().fetch();
+  }
+
+  Meteor.subscribe('headers');
+
+}
+```
+
+**website.html**
+```html
+<ul>
+	{{dstache}}#each headers}}
+		<li>{{dstache}}key}}: {{dstache}}value}}</li>
+	{{dstache}}/each}}
+</ul>
+```
+
+**Results (initial connection headers)**
+
+{{/markdown}}
+<ul>
+	{{#each headers}}
+		<li>{{key}}: {{value}}</li>
+	{{/each}}
+</ul>
+
+{{#markdown}}
+
+You can also use `headers.methodGet(this, 'host')`, etc.
+
+<a name="serverMethodDDP"></a>
+
+**Results (DDP/socket headers)**
+
+Using `headers.methodGet(this)`.
+
+{{/markdown}}
+
+
+<ul>
+	{{#each methodHeaders}}
+		<li>{{key}}: {{value}}</li>
+	{{/each}}
+</ul>
+
+</template>
+

@@ -1,0 +1,30 @@
+{
+  "meteor": {},
+  "dependencies": {
+    "basePackages": {
+      "headers": {
+        "version": "0.0.13"
+      },
+      "SyntaxHighlighter": {
+        "version": "3.0.83-8"
+      }
+    },
+    "packages": {
+      "headers": {
+        "git": "https://github.com/gadicohen/meteor-headers.git",
+        "tag": "v0.0.13",
+        "commit": "1b259f3af3df7a297584b1e2e5e89de8ad1a963a"
+      },
+      "SyntaxHighlighter": {
+        "git": "https://github.com/gadicohen/meteor-SyntaxHighlighter.git",
+        "tag": "v3.0.83-8",
+        "commit": "e8f17fced482e57bd51669e1f961f48d78ab1aee"
+      },
+      "sp-marked": {
+        "git": "https://bitbucket.org/parhelium/sp-marked",
+        "tag": "v0.0.2",
+        "commit": "fd044a222eeb4902a62da5839162b3d6dbd477be"
+      }
+    }
+  }
+}

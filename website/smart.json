@@ -1,0 +1,8 @@
+{
+  "packages": {
+    "headers": {
+		"path": ".."
+	},
+    "SyntaxHighlighter": {}
+  }
+}

@@ -4,6 +4,11 @@ Access HTTP headers on both server and client (+ clientIP funcs).
 
 For Meteor < 0.6.5, you need to use meteor-headers 0.0.7.
 
+Note since 0.0.13, headers are sent down with the initial page access
+and are available immediately (see below).
+
+For a working demo, see [headers.meteor.com](http://headers.meteor.com/).
+
 ## On the Client
 
 Use `headers.get()` to access HTTP headers sent by the client.
@@ -102,7 +107,8 @@ IP address of client connected to the socket over which the Method is running.
 
 Intro: headers **have to** come from the server.  Headers are NOT available
 from the browser via Javascript.  There's a trick to make an XHR request in the
-browser to get the headers, but note, this does NOT INCLUDE ALL HEADERS.
+browser to get the headers, but note, this does NOT INCLUDE ALL HEADERS (see
+which headers at [headers.meteor.com](http://headers.meteor.com/).
 Unfortunately the ONLY reliable method, to get all headers with their correct
 values, that the client sends to the server, is via the server.
 

@@ -1,0 +1,20 @@
+/* CSS declarations go here */
+
+body { background: #eee; }
+
+pre {
+	border: 1px solid #aaa; border-radius: 5px; 
+	padding: 5px; background: white;
+}
+.syntaxhighlighter { margin: 0 0 0 0 !important; }
+
+/* copied from meteor-messageformat */
+
+#TOC { 
+        display: inline-block;
+        border: 1px solid #aaa;
+        background-color: white;
+        padding: 5px 30px 5px 10px;
+        font-size: 95%;
+}
+#TOC div { text-align: center; font-weight: bold; }
