@@ -3,7 +3,7 @@
   "dependencies": {
     "basePackages": {
       "headers": {
-        "version": "0.0.13"
+        "path": ".."
       },
       "SyntaxHighlighter": {
         "version": "3.0.83-8"
@@ -11,9 +11,7 @@
     },
     "packages": {
       "headers": {
-        "git": "https://github.com/gadicohen/meteor-headers.git",
-        "tag": "v0.0.13",
-        "commit": "1b259f3af3df7a297584b1e2e5e89de8ad1a963a"
+        "path": ".."
       },
       "SyntaxHighlighter": {
         "git": "https://github.com/gadicohen/meteor-SyntaxHighlighter.git",
