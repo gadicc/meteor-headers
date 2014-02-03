@@ -22,6 +22,7 @@ function ipChain(headers, connection) {
  */
 Meteor.methods({
   'headersToken': function(token) {
+  	check(token, Number);
     if (headers.list[token]) {
       var data = this.connection || this._sessionData;
       data.headers = headers.list[token];

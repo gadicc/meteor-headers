@@ -2,6 +2,11 @@
 
 ## vNext
 
+## v0.0.14
+
+* Added a check() for `headersToken` method (fixes #12)
+* Created a test/demo website (`website` dir or [headers.meteor.com](http://headers.meteor.com)
+
 ## v0.0.13
 
 * Headers are now injected into the initial page load, so are available as
