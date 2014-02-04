@@ -148,26 +148,15 @@ var http = Npm.require('http');
 var originalWrite = http.OutgoingMessage.prototype.write;
 http.OutgoingMessage.prototype.write = function(chunk, encoding) {
   //prevent hijacking other http requests
-  if(this.mhData && !this.injected && 
+  if(this.mhData && !this.mhInjected && 
     encoding === undefined && /<!DOCTYPE html>/.test(chunk)) {
-
-    //if cors headers included if may cause some security holes. see more: 
-    //so we simply turn off fast-render if we detect an cors header
-    //read more: http://goo.gl/eGwb4e
-    if(this._headers['access-control-allow-origin']) {
-      var wanrMessage = 
-        'warn: fast-render turned off due to CORS headers. read more: http://goo.gl/eGwb4e';
-      console.warn(wanrMessage);
-      originalWrite.call(this, chunk, encoding);
-      return;
-    }
 
     // Indentation same as __meteor_runtime_config__
     var injectHtml = '<script type="text/javascript">__headers__ = \n'
     	+ JSON.stringify(this.mhData) + '</script>\n';
 
 	chunk = chunk.replace('<head>', '<head>\n' + injectHtml + '\n');
-    this.injected = true;
+    this.mhInjected = true;
   }
 
   originalWrite.call(this, chunk, encoding);
@@ -197,7 +186,7 @@ function appUrl(url) {
 };
 
 // Check page and add mhData if relevant
-WebApp.connectHandlers.use(Npm.require('connect').cookieParser());
+// WebApp.connectHandlers.use(Npm.require('connect').cookieParser());
 WebApp.connectHandlers.use(function(req, res, next) {
   if(appUrl(req.url)) {
   	// create a unique token to store headers for this request (see README)
@@ -210,7 +199,7 @@ WebApp.connectHandlers.use(function(req, res, next) {
     // data to be injected into initial page HEAD (see http.outgoing... above)
     res.mhData = { headers: req.headers, token: token };
 
-	next();
+    next();
   } else {
     next();
   }
