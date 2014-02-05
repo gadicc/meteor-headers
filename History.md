@@ -2,6 +2,11 @@
 
 ## vNext
 
+* Added test for calling `headers.get()` without a valid contect from a
+publish / method.
+* Added code to check if our workaround for onConnect works, see
+https://github.com/gadicohen/meteor-headers/issues/14#issuecomment-34243329.
+
 ## v0.0.14
 
 * Added a check() for `headersToken` method (fixes #12)

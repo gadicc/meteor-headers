@@ -113,5 +113,16 @@ if (Meteor.isServer) {
       });
   });
 
+  try {
+    headers.get();
+    throw new Error("Ran headers.get() outside of a method/publish and"
+      + "it didn't throw an error");
+  } catch (error) {
+    // TODO, make sure we're catching the correct error
+  }
+
+  Meteor.onConnection(function (connection) {
+    console.log(headers.methodGet({connection: connection}));
+  }); 
 
 }
