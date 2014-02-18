@@ -4,7 +4,11 @@ Access HTTP headers on both server and client (+ clientIP funcs).
 
 For Meteor < 0.6.5, you need to use meteor-headers 0.0.7.
 
-Note since 0.0.13, headers are sent down with the initial page access
+[2014-02-18] Note, for Meteor > 0.7.1, you are advised to use the `this.connection` object
+to access headers on the server.  You can still use the old way, but soon they
+will generate a warning.
+
+Since 0.0.13, headers are sent down with the initial page access
 and are available immediately (see below).
 
 For a working demo, see [headers.meteor.com](http://headers.meteor.com/).
