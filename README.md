@@ -114,6 +114,7 @@ in the chain specified as the end user's IP address. Thus, even if the end-user 
 Usage: `var ip = headers.methodClientIP(this);` (inside a Meteor method)
 
 IP address of client connected to the socket over which the Method is running.
+The same as `this.connection.clientAddress` in Meteor 0.7.1+.
 
 ## How and why this all works
 
