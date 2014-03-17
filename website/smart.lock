@@ -5,9 +5,7 @@
       "headers": {
         "path": ".."
       },
-      "SyntaxHighlighter": {
-        "version": "3.0.83-8"
-      }
+      "SyntaxHighlighter": {}
     },
     "packages": {
       "headers": {

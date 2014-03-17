@@ -2,6 +2,18 @@
 
 ## vNext
 
+## v0.0.16
+
+* Don't send cookies back to client (#18).
+* Use old method when browser-policy disallowInlineScripts() set (#19)
+or when using appcache (#11) - requires headers.ready() on client again
+in these situations.
+* Deprecate setting proxyCount via meteor-headers.  Use the
+HTTP_FORWARDED_COUNT environment variable by default (like 0.7.1+),
+and display a deprecation warning.
+
+## v0.0.15
+
 * Added test for calling `headers.get()` without a valid contect from a
 publish / method.
 * Added code to check if our workaround for onConnect works, see

@@ -14,7 +14,9 @@ headers.dep = new Deps.Dependency;
  */
 headers.store = function(mhData) {
 	this.list = mhData.headers;
-	Meteor.call('headersToken', mhData.token);
+	if (mhData.proxyCount)
+		this.proxyCount = mhData.proxyCount;
+	Meteor.call('headersToken', mhData.token || this.token);
  	for (var i=0; i < this.readies.length; i++)
  		this.readies[i]();
  	this.readiesRun = true;
@@ -50,9 +52,24 @@ headers.ready = function(callback) {
 	}
 };
 
-// Since 0.0.13, headers are available before this package is loaded :)
-headers.store(__headers__);
-delete(__headers__);
+if (0 && __headers__) {
+	// Since 0.0.13, headers are available before this package is loaded :)
+	headers.store(__headers__);
+	delete(__headers__);
+} else {
+	// Except in tests, browserPolicy disallowInlineScripts() and appcache
+	/*
+ 	* Create another connection to retrieve our headers (see README.md for
+ 	* why this is necessary).  Called with our unique token, the retrieved
+ 	* code runs headers.store() above with the results
+	*/
+	(function(d, t) {
+	    var g = d.createElement(t),
+	        s = d.getElementsByTagName(t)[0];
+	    g.src = '/headersHelper.js?token=' + headers.token;
+	    s.parentNode.insertBefore(g, s);
+	}(document, 'script'));
+}
 
 /*
  * Get a header or all headers
@@ -69,5 +86,6 @@ headers.getClientIP = function(proxyCount) {
 	var chain = this.get('x-ip-chain').split(',');
 	if (typeof(proxyCount) == 'undefined')
 		proxyCount = this.proxyCount;
+	console.log(chain, proxyCount);
 	return chain[chain.length - proxyCount - 1];
 }

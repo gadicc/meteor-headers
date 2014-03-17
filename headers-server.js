@@ -1,5 +1,19 @@
 var HEADERS_CLEANUP_TIME = 300000;  // 5 minutes
 
+// Can only inject headers w/o appcache, and when inlineScriptsAllowed()
+var INJECT_HEADERS = !Package.appcache
+  && WebAppInternals.inlineScriptsAllowed();
+
+// be helpful on meteor.com
+if (process.env.ROOT_URL.match(/meteor.com$/) &&
+      typeof(process.env.HTTP_FORWARDED_COUNT) == 'undefined')
+    process.env.HTTP_FORWARDED_COUNT = 1;
+
+// Since Meteor 0.7.1, replaces headers.setProxy(count);
+// +1 is for our strategy of always adding the host to x-ip-chain
+if (process.env.HTTP_FORWARDED_COUNT)
+  headers.proxyCount = parseInt(process.env.HTTP_FORWARDED_COUNT);
+
 /*
  * Returns an array describing the suspected IP route the connection has taken.
  * This is in order of trust, see the README.md for which value to use
@@ -10,7 +24,7 @@ function ipChain(headers, connection) {
     _.each(headers['x-forwarded-for'].split(','), function(ip) {
       chain.push(ip.replace('/\s*/g', ''));
     });
-  if (chain.length == 0 || chain[chain.length-1] != connection.remoteAddress)
+//  if (chain.length == 0 || chain[chain.length-1] != connection.remoteAddress)
     chain.push(connection.remoteAddress);
   return chain;
 }
@@ -88,8 +102,10 @@ headers.ready = function(self) {
 headers.getClientIP = function(self, proxyCount) {
   checkSelf(self, 'getClientIP');
   var chain = this.get(self, 'x-ip-chain').split(',');
-  if (typeof(proxyCount) == 'undefined')
+  if (typeof(proxyCount) == 'undefined') {
+    this.proxyCountDeprecated(proxyCount);
     proxyCount = this.proxyCount;
+  }
   return chain[chain.length - proxyCount - 1];
 }
 
@@ -127,8 +143,10 @@ headers.methodGet = function(self, header) {
 headers.methodClientIP = function(self, proxyCount) {
   checkSelf(self, 'methodClientIP');
   var chain = this.methodGet(self, 'x-ip-chain');
-  if (typeof(proxyCount) == 'undefined')
+  if (typeof(proxyCount) == 'undefined') {
+    this.proxyCountDeprecated(proxyCount);
     proxyCount = this.proxyCount;
+  }
   return chain[chain.length - proxyCount - 1];
 }
 
@@ -185,8 +203,26 @@ function appUrl(url) {
   return true;
 };
 
+// What's safe to send back to the client?
+var filtered = function(headers) {
+  var filtered;
+
+  if (headers.cookie || headers.authorization) {
+    filtered = _.clone(headers);
+    if (filtered.cookie)
+      delete(filtered.cookie);
+    if (filtered.authorization)
+      delete(filtered.authorization);
+    return filtered;
+  } else {
+    return headers;
+  }
+
+}
+
 // Check page and add mhData if relevant
 // WebApp.connectHandlers.use(Npm.require('connect').cookieParser());
+if (INJECT_HEADERS)
 WebApp.connectHandlers.use(function(req, res, next) {
   if(appUrl(req.url)) {
   	// create a unique token to store headers for this request (see README)
@@ -197,10 +233,35 @@ WebApp.connectHandlers.use(function(req, res, next) {
     req.headers['x-ip-chain'] = ipChain(req.headers, req.connection).join(',');
 
     // data to be injected into initial page HEAD (see http.outgoing... above)
-    res.mhData = { headers: req.headers, token: token };
+    res.mhData = { headers: filtered(req.headers), token: token };
+
+    if (headers.proxyCount)
+      res.mhData.proxyCount = headers.proxyCount;
 
     next();
   } else {
     next();
   }
+});
+
+/*
+ * The client will request this "script", and send a unique token with it,
+ * which we later use to re-associate the headers from this request with
+ * the user's livedata session (since XHR requests only send a subset of
+ * all the regular headers).
+ */
+WebApp.connectHandlers.use('/headersHelper.js', function(req, res, next) {
+  var token = req.query.token;
+  var mhData = { headers: {} };
+
+  req.headers['x-ip-chain'] = ipChain(req.headers, req.connection).join(',');
+  headers.list[token] = req.headers;
+  mhData.headers = filtered(req.headers);
+
+  if (headers.proxyCount)
+    mhData.proxyCount = headers.proxyCount;
+
+  res.writeHead(200, { 'Content-type': 'application/javascript' });
+  res.end("Package.headers.headers.store("
+    + JSON.stringify(mhData) + ");", 'utf8');
 });

@@ -3,9 +3,6 @@ var methodHeadersCol = new Meteor.Collection('methodHeaders');
 
 if (Meteor.isClient) {
 
-  if (__meteor_runtime_config__.ROOT_URL == "http://headers.meteor.com")
-    headers.setProxyCount(1);
-
   /* Helpers */
 
   Handlebars.registerHelper('dstache', function() {
@@ -19,7 +16,10 @@ if (Meteor.isClient) {
   /* clientIP + socketIP */
 
   Template.clientIP.clientIP = function() {
-    return headers.getClientIP();
+    if (headers.ready())
+      return headers.getClientIP();
+    else
+      return 'Loading...';
   }
 
   Session.setDefault('socketIP', 'Loading...');
@@ -35,7 +35,10 @@ if (Meteor.isClient) {
   /* clientHeaders */
 
   Template.clientHeaders.headers = function() {
-    return JSON.stringify(headers.get(), null, 2);
+    if (headers.ready())
+      return JSON.stringify(headers.get(), null, 2);
+    else
+      return 'Loading...';
   }
 
   /* serverHeaders (via method call) */
@@ -74,17 +77,21 @@ if (Meteor.isClient) {
   Meteor.subscribe('headers');
   Meteor.subscribe('methodHeaders');
 
+  headers.ready(function() {
+    console.log('headers are ready');
+    console.log(headers);
+  });
+
 }
 
 if (Meteor.isServer) {
-
-  if (process.env.ROOT_URL == "http://headers.meteor.com")
-    headers.setProxyCount(1);
 
   /* serverHeaders (via method call) */
 
   Meteor.methods({
     'headers': function() {
+      //console.log(this.connection);
+
       return headers.get(this);
     },
     'methodHeaders': function() {
@@ -121,8 +128,8 @@ if (Meteor.isServer) {
     // TODO, make sure we're catching the correct error
   }
 
-  Meteor.onConnection(function (connection) {
-    console.log(headers.methodGet({connection: connection}));
+  Meteor.onConnection(function(connection) {
+    //console.log(headers.methodGet({connection: connection}));
   }); 
 
 }
