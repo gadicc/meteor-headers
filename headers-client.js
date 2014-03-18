@@ -76,7 +76,7 @@ if (0 && __headers__) {
  */
 headers.get = function(header) {
  	this.dep.depend();
-	return header ? this.list[header] : this.list;
+	return header ? this.list[header.toLocaleLowerCase()] : this.list;
 }
 
 /*

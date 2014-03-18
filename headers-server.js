@@ -89,7 +89,10 @@ headers.get = function(self, key) {
   headerDep(sessionData).depend();
   if (!(sessionData && sessionData.headers))
     return key ? undefined : {};
-  return key ? sessionData.headers[key] : sessionData.headers;
+
+  return key
+    ? sessionData.headers[key.toLocaleLowerCase()]
+    : sessionData.headers;
 }
 
 headers.ready = function(self) {
