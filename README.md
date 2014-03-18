@@ -4,6 +4,8 @@ Access HTTP headers on both server and client (+ clientIP funcs).
 
 For a working demo, see [headers.meteor.com](http://headers.meteor.com/).
 
+Copyright (c) 2013-2014 Gadi Cohen, released under the GPL v3.
+
 For Meteor < 0.6.5, you need to use meteor-headers 0.0.7.
 
 Since 0.0.16, headers are sent down with the initial page access
