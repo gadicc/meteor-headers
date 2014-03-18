@@ -79,6 +79,12 @@ For more info see the relevant sections in the iron-router docs.
 See the notes below on how we retrieve the headers, why it's necessary
 to do it this way, and also the note about `getClientIP()`.
 
+The following headers are NOT sent back to the client:
+
+* **cookie** - dangerous, can be used to bypass httpOnly.  access via JS.
+* **authorization** - uneeded, potentially dangerous
+* **user-agent** - uneeded, access via `navigator.userAgent`
+
 ## On the Server
 
 As above, but you need to pass `this` as the first argument.  e.g.
