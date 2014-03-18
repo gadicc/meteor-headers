@@ -206,21 +206,18 @@ function appUrl(url) {
   return true;
 };
 
-// What's safe to send back to the client?
+// What's safe + necessary to send back to the client?
 var filtered = function(headers) {
-  var filtered;
+  var filtered = _.clone(headers);
+  var keys = ['user-agent', 'cookie', 'authorization'];
 
-  if (headers.cookie || headers.authorization) {
-    filtered = _.clone(headers);
-    if (filtered.cookie)
-      delete(filtered.cookie);
-    if (filtered.authorization)
-      delete(filtered.authorization);
-    return filtered;
-  } else {
-    return headers;
-  }
+  // _.each() looks nicer, but is slower, and this happens on every connect
+  // http://benhollis.net/blog/2009/12/13/investigating-javascript-array-iteration-performance/
+  for (var i=0; i < keys.length; i++)
+    if (filtered[keys[i]])
+      delete(filtered[keys[i]]);
 
+  return filtered;
 }
 
 // Check page and add mhData if relevant
