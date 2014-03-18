@@ -2,6 +2,12 @@
 
 ## vNext
 
+## v0.0.17
+
+* License under the GPLv3 (#21)
+* Make headers.get() case insensitive, just like in ExpressJS (#20)
+* Don't needlessly send user-agent back to client (use navigator.userAgent)
+
 ## v0.0.16
 
 * Don't send cookies back to client (#18).
