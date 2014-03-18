@@ -8,6 +8,9 @@
 * Make headers.get() case insensitive, just like in ExpressJS (#20)
 * Don't needlessly send user-agent back to client (use navigator.userAgent)
 
+Thanks to [https://github.com/Nemo64 Nemo64] for discussing on
+these issues.
+
 ## v0.0.16
 
 * Don't send cookies back to client (#18).
@@ -17,6 +20,8 @@ in these situations.
 * Deprecate setting proxyCount via meteor-headers.  Use the
 HTTP_FORWARDED_COUNT environment variable by default (like 0.7.1+),
 and display a deprecation warning.
+
+Thanks are due to [https://github.com/Nemo64 Nemo64] for #18 and #19.
 
 ## v0.0.15
 
