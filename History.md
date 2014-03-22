@@ -2,6 +2,10 @@
 
 ## vNext
 
+* Outsource inject code to inject-initial package.
+* Store headers in a META tag rather than inline script, to work with
+  browserPolicy.content.disallowInlineScripts().
+
 ## v0.0.17
 
 * License under the GPLv3 (#21)

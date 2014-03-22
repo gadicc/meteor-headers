@@ -1,11 +1,7 @@
 var HEADERS_CLEANUP_TIME = 300000;  // 5 minutes
 
-// Can only inject headers w/o appcache, and when inlineScriptsAllowed()
-var INJECT_HEADERS = !Package.appcache
-  && WebAppInternals.inlineScriptsAllowed();
-
 // be helpful on meteor.com
-if (process.env.ROOT_URL.match(/meteor.com$/) &&
+if (process.env.ROOT_URL.match(/meteor.com$/i) &&
       typeof(process.env.HTTP_FORWARDED_COUNT) == 'undefined')
     process.env.HTTP_FORWARDED_COUNT = 1;
 
@@ -153,58 +149,6 @@ headers.methodClientIP = function(self, proxyCount) {
   return chain[chain.length - proxyCount - 1];
 }
 
-/*
- * All this code is below adapted from Fast Render by Arunoda Susiripala
- * https://github.com/arunoda/meteor-fast-render/blob/master/lib/server/inject.js
- *
- */
-
-//When a HTTP Request comes, we need to figure out is it a proper request
-//then get some query data
-//then hijack html return by meteor
-//code below, does that in abstract way
-
-var http = Npm.require('http');
-
-var originalWrite = http.OutgoingMessage.prototype.write;
-http.OutgoingMessage.prototype.write = function(chunk, encoding) {
-  //prevent hijacking other http requests
-  if(this.mhData && !this.mhInjected && 
-    encoding === undefined && /<!DOCTYPE html>/.test(chunk)) {
-
-    // Indentation same as __meteor_runtime_config__
-    var injectHtml = '<script type="text/javascript">__headers__ = \n'
-    	+ JSON.stringify(this.mhData) + '</script>\n';
-
-	chunk = chunk.replace('<head>', '<head>\n' + injectHtml + '\n');
-    this.mhInjected = true;
-  }
-
-  originalWrite.call(this, chunk, encoding);
-};
-
-//meteor algorithm to check if this is a meteor serving http request or not
-//add routepolicy package to the fast-render
-function appUrl(url) {
-  if (url === '/favicon.ico' || url === '/robots.txt')
-    return false;
-
-  // NOTE: app.manifest is not a web standard like favicon.ico and
-  // robots.txt. It is a file name we have chosen to use for HTML5
-  // appcache URLs. It is included here to prevent using an appcache
-  // then removing it from poisoning an app permanently. Eventually,
-  // once we have server side routing, this won't be needed as
-  // unknown URLs with return a 404 automatically.
-  if (url === '/app.manifest')
-    return false;
-
-  // Avoid serving app HTML for declared routes such as /sockjs/.
-  if (typeof(RoutePolicy) != 'undefined' && RoutePolicy.classify(url))
-    return false;
-
-  // we currently return app HTML on all URLs by default
-  return true;
-};
 
 // What's safe + necessary to send back to the client?
 var filtered = function(headers) {
@@ -219,30 +163,6 @@ var filtered = function(headers) {
 
   return filtered;
 }
-
-// Check page and add mhData if relevant
-// WebApp.connectHandlers.use(Npm.require('connect').cookieParser());
-if (INJECT_HEADERS)
-WebApp.connectHandlers.use(function(req, res, next) {
-  if(appUrl(req.url)) {
-  	// create a unique token to store headers for this request (see README)
-  	var token = new Date().getTime() + Math.random();
-  	headers.list[token] = req.headers;
-
-  	// for the getClientIP helper
-    req.headers['x-ip-chain'] = ipChain(req.headers, req.connection).join(',');
-
-    // data to be injected into initial page HEAD (see http.outgoing... above)
-    res.mhData = { headers: filtered(req.headers), token: token };
-
-    if (headers.proxyCount)
-      res.mhData.proxyCount = headers.proxyCount;
-
-    next();
-  } else {
-    next();
-  }
-});
 
 /*
  * The client will request this "script", and send a unique token with it,
@@ -265,3 +185,23 @@ WebApp.connectHandlers.use('/headersHelper.js', function(req, res, next) {
   res.end("Package.headers.headers.store("
     + JSON.stringify(mhData) + ");", 'utf8');
 });
+
+// Can only inject headers w/o appcache
+if (!Package.appcache)
+WebApp.connectHandlers.use(function(req, res, next) {
+  if(Inject.appUrl(req.url)) {
+  	var mhData = {
+      token: new Date().getTime() + Math.random()
+    }
+    if (headers.proxyCount)
+      mhData.proxyCount = headers.proxyCount;
+
+    req.headers['x-ip-chain'] = ipChain(req.headers, req.connection).join(',');
+    headers.list[mhData.token] = req.headers;
+    mhData.headers = filtered(req.headers);
+
+    Inject.obj('headers', mhData, res);
+  }
+  next();
+});
+

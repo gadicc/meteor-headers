@@ -8,10 +8,10 @@ Copyright (c) 2013-2014 Gadi Cohen, released under the LGPL v3.
 
 For Meteor < 0.6.5, you need to use meteor-headers 0.0.7.
 
-Since 0.0.16, headers are sent down with the initial page access
-and are available immediately, except when appcache or browser-policy
-with disallowInlineScripts() is used.  So, please still use the
-`headers.ready()` callback.  Additionally, `proxyCount` is deprecated,
+Since 0.0.18, headers are sent down with the initial page access
+and are available immediately, except when appcache is used.
+So, please still use the `headers.ready()` callback.  Additionally,
+`proxyCount` is deprecated,
 please use set the `HTTP_FORWARDED_COUNT` environment variable instead.
 
 ## Two different types of Headers
@@ -42,9 +42,8 @@ Note that all header field names are *lowercase*.  e.g.
 etc (like with ExpressJS [req.get](http://expressjs.com/api.html#req.get)).
 
 Headers are available as soon as the package is loaded, i.e. before any
-of your app code is run, provided appcache and browser-policy with
-disallowInlineScripts() are not used.  To be safe, run any code that
-relies on `headers.get` like this:
+of your app code is run, provided appcache is not used.  To be safe,
+run any code that relies on `headers.get` like this:
 
 ```js
 headers.ready(function() {
@@ -144,9 +143,9 @@ original request to the current socket.  This allows for headers.get()
 (as opposed to headers.methodGet) to return the correct data, which is
 kept in the connection session (maintained by livedata).
 
-When appcache or browser-policy with disallowInlineScripts() is used,
-we have to make an extra round-trip to the server to get this data
-via an additional script.
+When appcache is used, we don't get the original HTML page with the headers
+on it, so we just make a script call to an additional internal script to get
+them.
 
 ## References
 

@@ -52,7 +52,8 @@ headers.ready = function(callback) {
 	}
 };
 
-if (0 && __headers__) {
+var __headers__ = Inject.getObj('headers');
+if (__headers__) {
 	// Since 0.0.13, headers are available before this package is loaded :)
 	headers.store(__headers__);
 	delete(__headers__);
