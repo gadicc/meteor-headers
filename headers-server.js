@@ -200,7 +200,7 @@ WebApp.connectHandlers.use(function(req, res, next) {
     headers.list[mhData.token] = req.headers;
     mhData.headers = filtered(req.headers);
 
-    Inject.obj('headers', mhData, res);
+    Inject.obj('meteor-headers', mhData, res);
   }
   next();
 });

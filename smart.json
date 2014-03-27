@@ -5,5 +5,7 @@
     "author": "Gadi Cohen <dragon@wastelands.net>",
     "version": "0.0.17",
     "git": "https://github.com/gadicohen/meteor-headers.git",
-	"packages": {}
+	"packages": {
+		"inject-initial": "0.0.1"
+	}
 }

@@ -52,7 +52,7 @@ headers.ready = function(callback) {
 	}
 };
 
-var __headers__ = Inject.getObj('headers');
+var __headers__ = Inject.getObj('meteor-headers');
 if (__headers__) {
 	// Since 0.0.13, headers are available before this package is loaded :)
 	headers.store(__headers__);
