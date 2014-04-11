@@ -87,6 +87,5 @@ headers.getClientIP = function(proxyCount) {
 	var chain = this.get('x-ip-chain').split(',');
 	if (typeof(proxyCount) == 'undefined')
 		proxyCount = this.proxyCount;
-	console.log(chain, proxyCount);
 	return chain[chain.length - proxyCount - 1];
 }

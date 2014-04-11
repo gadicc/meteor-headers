@@ -2,9 +2,16 @@
 
 ## vNext
 
+## v0.0.22
+
+* Removed console.log() from client headers.getClientIP() (#25)
+
+## v0.0.21
+
 * Outsource inject code to inject-initial package.
 * Store headers in a META tag rather than inline script, to work with
   browserPolicy.content.disallowInlineScripts().
+* Various minor fixes related to the above
 
 ## v0.0.17
 
