@@ -1,6 +1,10 @@
 # meteor-headers changelog
 
-## vNext
+## vNEXT
+
+## v0.0.24
+
+* Bump `inject-initial` to v0.0.8
 
 ## v0.0.22
 
