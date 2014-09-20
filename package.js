@@ -1,5 +1,8 @@
 Package.describe({
-    summary: "Access HTTP headers on both server and client"
+  name: 'gadicohen:headers',
+  summary: "Access HTTP headers on both server and client",
+  version: "0.0.25",
+  git: "https://github.com/gadicc/meteor-headers.git"
 });
 
 Npm.depends({
@@ -7,10 +10,10 @@ Npm.depends({
 });
 
 Package.on_use(function(api) {
-	// meteor-headers 0.0.7 was the last version to support Meteor < 0.6.5
+  api.versionsFrom("METEOR@0.9.0");
 	api.use(['webapp', 'livedata', 'templating', 'deps'], ['client', 'server']);
 	api.use('appcache', 'server', { weak: true });
-	api.use('inject-initial', ['server', 'client']);
+	api.use("meteorhacks:inject-initial@1.0.2", ['server', 'client']);
 
     api.add_files('headers-common.js', ['client', 'server']);
     api.add_files('headers-server.js', 'server');

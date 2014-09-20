@@ -2,6 +2,10 @@
 
 ## vNEXT
 
+## v0.0.25
+
+* Bump `inject-initial` dep.  Upgrade `website` for 0.9.  (#28)
+
 ## v0.0.24
 
 * Bump `inject-initial` to v0.0.8

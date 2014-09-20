@@ -5,7 +5,7 @@
 
 standard-app-packages
 insecure
-preserve-inputs
-headers
-SyntaxHighlighter
-inject-initial
+gadicohen:headers
+meteorhacks:inject-initial
+gadicohen:syntaxhighlighter@3.0.83-17
+mrt:sp-marked

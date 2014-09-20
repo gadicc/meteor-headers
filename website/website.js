@@ -5,13 +5,18 @@ if (Meteor.isClient) {
 
   /* Helpers */
 
-  Handlebars.registerHelper('dstache', function() {
+  Blaze.Template.registerHelper('dstache', function() {
         return '{{';
   });
 
-  Handlebars.registerHelper('markdown', function(options) {
-        return marked(options.fn(this));
-  });
+  Blaze.Template.registerHelper("markdown", new Template('markdown', function () {
+    var view = this;
+    var content = '';
+    if (view.templateContentBlock) {
+      content = Blaze._toText(view.templateContentBlock, HTML.TEXTMODE.STRING);
+    }
+    return HTML.Raw(marked(content));
+  }));
 
   /* clientIP + socketIP */
 
