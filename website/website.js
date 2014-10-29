@@ -133,8 +133,13 @@ if (Meteor.isServer) {
     // TODO, make sure we're catching the correct error
   }
 
+  /* onConnection */
+
   Meteor.onConnection(function(connection) {
     //console.log(headers.methodGet({connection: connection}));
-  }); 
 
+    // This will never work as it runs too early, see
+    // https://github.com/gadicc/meteor-headers/issues/30
+    // console.log(headers.get({connection: connection}));
+  }); 
 }

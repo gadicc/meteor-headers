@@ -2,6 +2,11 @@
 
 ## vNEXT
 
+## v0.0.26
+
+* Fixes for appcache on Meteor 0.9+ (#31)
+* Thanks @dandv for misc PRs and helpful issues (#32, #33, #34)
+
 ## v0.0.25
 
 * Bump `inject-initial` dep.  Upgrade `website` for 0.9.  (#28)

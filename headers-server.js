@@ -182,7 +182,7 @@ WebApp.connectHandlers.use('/headersHelper.js', function(req, res, next) {
     mhData.proxyCount = headers.proxyCount;
 
   res.writeHead(200, { 'Content-type': 'application/javascript' });
-  res.end("Package.headers.headers.store("
+  res.end("Package['gadicohen:headers'].headers.store("
     + JSON.stringify(mhData) + ");", 'utf8');
 });
 

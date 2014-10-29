@@ -9,3 +9,5 @@ gadicohen:headers
 meteorhacks:inject-initial
 gadicohen:syntaxhighlighter@3.0.83-17
 mrt:sp-marked
+appcache
+
