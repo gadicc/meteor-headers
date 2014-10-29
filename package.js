@@ -1,23 +1,23 @@
 Package.describe({
   name: 'gadicohen:headers',
-  summary: "Access HTTP headers on both server and client",
+  summary: 'Access HTTP headers on both server and client',
   version: "0.0.25",
-  git: "https://github.com/gadicc/meteor-headers.git"
+  git: 'https://github.com/gadicc/meteor-headers.git'
 });
 
 Npm.depends({
-  "connect": "2.12.0"
+  'connect': '2.12.0'
 });
 
-Package.on_use(function(api) {
-  api.versionsFrom("METEOR@0.9.0");
-	api.use(['webapp', 'livedata', 'templating', 'deps'], ['client', 'server']);
-	api.use('appcache', 'server', { weak: true });
-	api.use("meteorhacks:inject-initial@1.0.2", ['server', 'client']);
+Package.onUse(function(api) {
+  api.versionsFrom("0.9.0");
+  api.use(['webapp', 'livedata', 'templating', 'deps'], ['client', 'server']);
+  api.use('appcache', 'server', { weak: true });
+  api.use("meteorhacks:inject-initial@1.0.2", ['server', 'client']);
 
-    api.add_files('headers-common.js', ['client', 'server']);
-    api.add_files('headers-server.js', 'server');
-    api.add_files('headers-client.js', 'client');
+  api.addFiles('headers-common.js', ['client', 'server']);
+  api.addFiles('headers-server.js', 'server');
+  api.addFiles('headers-client.js', 'client');
 
-	api.export('headers', ['client', 'server']);
+  api.export('headers', ['client', 'server']);
 });
