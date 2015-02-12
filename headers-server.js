@@ -152,16 +152,15 @@ headers.methodClientIP = function(self, proxyCount) {
 
 // What's safe + necessary to send back to the client?
 var filtered = function(headers) {
-  var filtered = _.clone(headers);
-  var keys = ['user-agent', 'cookie', 'authorization'];
+  var out = {};
+  var ignoreKeys = ['user-agent', 'cookie', 'authorization'];
 
-  // _.each() looks nicer, but is slower, and this happens on every connect
-  // http://benhollis.net/blog/2009/12/13/investigating-javascript-array-iteration-performance/
-  for (var i=0; i < keys.length; i++)
-    if (filtered[keys[i]])
-      delete(filtered[keys[i]]);
+  for (var key in headers)
+    if (typeof ignoreKeys[key] === 'undefined'
+        && !headers[key].match(/<\/?\s*script\s*>/i))
+      out[key] = headers[key];
 
-  return filtered;
+  return out;
 }
 
 /*

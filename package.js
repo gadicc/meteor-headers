@@ -1,7 +1,7 @@
 Package.describe({
   name: 'gadicohen:headers',
   summary: 'Access HTTP headers on both server and client',
-  version: "0.0.26",
+  version: "0.0.27",
   git: 'https://github.com/gadicc/meteor-headers.git'
 });
 

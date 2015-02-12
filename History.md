@@ -2,6 +2,11 @@
 
 ## vNEXT
 
+## v0.0.27
+
+* Fix XSS vulnerability where in-line code could be injected via headers.
+  We now drop headers that include <script> or </script> tags (#36)
+
 ## v0.0.26
 
 * Fixes for appcache on Meteor 0.9+ (#31)
