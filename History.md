@@ -2,10 +2,19 @@
 
 ## vNEXT
 
+## v0.0.28
+
+* Fix broken filter for `cookie`, `user-agent` and `authorization` keys.
+  These should never be sent to the client, either because they represent
+  a security risk or are available on the client anyways.  e.g.
+  `document.cookie` (except for httpOnly cookies), `navigator.userAgent`,
+  etc. Thanks @marcodejongh for reporting (#42).
+
 ## v0.0.27
 
 * Fix XSS vulnerability where in-line code could be injected via headers.
-  We now drop headers that include <script> or </script> tags (#36)
+  We now drop headers that include <script> or </script> tags.  Thanks,
+  @shipcod3, for reporting.  (#36)
 
 ## v0.0.26
 

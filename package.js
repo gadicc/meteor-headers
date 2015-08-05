@@ -1,7 +1,7 @@
 Package.describe({
   name: 'gadicohen:headers',
   summary: 'Access HTTP headers on both server and client',
-  version: "0.0.27",
+  version: "0.0.28",
   git: 'https://github.com/gadicc/meteor-headers.git'
 });
 
@@ -15,9 +15,15 @@ Package.onUse(function(api) {
   api.use('appcache', 'server', { weak: true });
   api.use("meteorhacks:inject-initial@1.0.2", ['server', 'client']);
 
-  api.addFiles('headers-common.js', ['client', 'server']);
-  api.addFiles('headers-server.js', 'server');
-  api.addFiles('headers-client.js', 'client');
+  api.addFiles('lib/headers-common.js', ['client', 'server']);
+  api.addFiles('lib/headers-server.js', 'server');
+  api.addFiles('lib/headers-client.js', 'client');
 
   api.export('headers', ['client', 'server']);
+});
+
+Package.onTest(function(api) {
+  api.use(['tinytest', 'gadicohen:headers']);
+  api.addFiles('tests/tests-client.js', 'client');
+  api.addFiles('tests/tests-server.js', 'server');
 });

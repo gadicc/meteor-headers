@@ -147,6 +147,16 @@ When appcache is used, we don't get the original HTML page with the headers
 on it, so we just make a script call to an additional internal script to get
 them.
 
+## Headers not sent to the client
+
+The following headers are filtered out and never sent to the client, either
+because they represent a security risk or are available on the client anyways
+(and it would waste bandwidth to send them unnecessarily):
+
+* `cookie` - use `document.cookie` for anything not marked as `httpOnly`
+* `user-agent` - use `navigator.userAgent`
+* `authorization`
+
 ## References
 
 * [List of HTTP header fields](http://en.wikipedia.org/wiki/List_of_HTTP_header_fields)
