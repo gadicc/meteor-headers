@@ -11,7 +11,7 @@ Npm.depends({
 
 Package.onUse(function(api) {
   api.versionsFrom("0.9.0");
-  api.use(['webapp', 'livedata', 'templating', 'deps'], ['client', 'server']);
+  api.use(['webapp', 'livedata', 'deps'], ['client', 'server']);
   api.use('appcache', 'server', { weak: true });
   api.use("meteorhacks:inject-initial@1.0.2", ['server', 'client']);
 
