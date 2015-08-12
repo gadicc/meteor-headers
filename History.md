@@ -2,6 +2,11 @@
 
 ## vNEXT
 
+## v0.0.30
+
+* Remove unused dep on `templating` (thanks @cherbst, #43)
+* Bump for failed upload of v0.0.29
+
 ## v0.0.28
 
 * Fix broken filter for `cookie`, `user-agent` and `authorization` keys.

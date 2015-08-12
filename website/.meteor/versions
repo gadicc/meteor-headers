@@ -13,7 +13,7 @@ deps@1.0.6
 ejson@1.0.5
 fastclick@1.0.2
 follower-livedata@1.0.3
-gadicohen:headers@0.0.27
+gadicohen:headers@0.0.28
 gadicohen:syntaxhighlighter@3.0.83_19
 geojson-utils@1.0.2
 html-tools@1.0.3
